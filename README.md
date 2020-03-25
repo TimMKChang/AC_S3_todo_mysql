@@ -1,21 +1,22 @@
-# Todo List [Try Now!](https://mkc-todo.herokuapp.com/)
+# Todo List [Try Now!](https://mkc-todo-mysql.herokuapp.com/)
 Built by 
 - [Node.js](https://nodejs.org/en/)
 - [express](https://www.npmjs.com/package/express)
 - [express-handlebars](https://www.npmjs.com/package/express-handlebars)
 - [body-parser](https://www.npmjs.com/package/body-parser)
 - [method-override](https://www.npmjs.com/package/method-override)
-- [MongoDB](https://www.mongodb.com/)
-- [Mongoose](https://www.npmjs.com/package/mongoose)
 - [Passport](https://www.npmjs.com/package/passport)
 - [bcryptjs](https://www.npmjs.com/package/bcryptjs)
+- [mysql2](https://www.npmjs.com/package/mysql2)
+- [sequelize](https://www.npmjs.com/package/sequelize)
+- [sequelize-cli](https://www.npmjs.com/package/sequelize-cli)
 
 ## Project Preview
 ![Project Preview](/public/image/todo_list_auth_preview.PNG)
 
 ## Features
 - Todo List
-- MongoDB
+- MySQL
 - CRUD operations
 - RESTful
 - Express Router
@@ -50,11 +51,9 @@ Built by
 >git clone https://github.com/TimMKChang/AC_S3_todo_list_auth.git
 2. install packages
 >npm install
-3. run seeder in /models/seeds
->node todoSeeder.js
-4. run the server
+3. run the server
 >npm run dev
-5. check in cmd
+4. check in cmd
 >App is listening on [localhost:3000](http://localhost:3000)
 
 ## Contributor
