@@ -1,8 +1,10 @@
 const express = require('express')
 const router = express.Router()
-const User = require('../models/user')
 const passport = require('passport')
 const bcrypt = require('bcryptjs')
+
+const db = require('../models')
+const User = db.User
 
 // login page
 router.get('/login', (req, res) => {
@@ -25,7 +27,7 @@ router.post('/login', (req, res, next) => {
     }
     req.logIn(user, (err) => {
       if (err) { return next(err); }
-      return res.redirect('/');
+      return res.redirect('/todos');
     });
   })(req, res, next)
 })
@@ -57,7 +59,7 @@ router.post('/register', (req, res) => {
     })
   }
 
-  User.findOne({ email: email })
+  User.findOne({ where: { email: email } })
     .then(user => {
       if (user) {
 

@@ -1,10 +1,30 @@
 const express = require('express')
 const router = express.Router()
-const Todo = require('../models/todo')
+const db = require('../models')
+const Todo = db.Todo
+const User = db.User
+
+const { authenticated } = require('../config/auth')
+router.all('*', authenticated)
 
 // show all todos
 router.get('/', (req, res) => {
-  return res.redirect('/')
+  User.findByPk(req.user.id)
+    .then((user) => {
+      if (!user) throw new Error("user not found")
+
+      return Todo.findAll({
+        raw: true,
+        nest: true,
+        where: { UserId: req.user.id }
+      })
+    })
+    .then(todos => {
+      return res.render('index', { todos })
+    })
+    .catch(err => {
+      return console.error(err)
+    })
 })
 // create todo page
 router.get('/new', (req, res) => {
@@ -12,76 +32,80 @@ router.get('/new', (req, res) => {
 })
 // get one todo
 router.get('/:id', (req, res) => {
-  Todo.findOne({ _id: req.params.id, userId: req.user._id })
-    .lean()
-    .then(todo => {
-      return res.render('detail', { todo })
+  User.findByPk(req.user.id)
+    .then((user) => {
+      if (!user) throw new Error("user not found");
+
+      return Todo.findOne({
+        where: {
+          UserId: req.user.id,
+          Id: req.params.id
+        }
+      })
     })
-    .catch(err => {
-      return console.error(err)
-    })
+    .then((todo) => { return res.render('detail', { todo: todo.get() }) })
+    .catch((error) => { return res.status(422).json(error) })
 })
 // create todo
 router.post('/', (req, res) => {
-  const todo = new Todo({
+  Todo.create({
     name: req.body.name,
-    userId: req.user._id
+    done: false,
+    UserId: req.user.id
   })
-  todo.save(err => {
-    if (err) {
-      return console.error(err)
-    }
-    return res.redirect('/')
-  })
+    .then((todo) => {
+      return res.redirect('/todos')
+    })
+    .catch((error) => {
+      return res.status(422).json(error)
+    })
 })
 // update todo page
 router.get('/:id/edit', (req, res) => {
-  Todo.findOne({ _id: req.params.id, userId: req.user._id })
-    .lean()
-    .then(todo => {
-      return res.render('edit', { todo })
+  User.findByPk(req.user.id)
+    .then((user) => {
+      if (!user) throw new Error("user not found")
+      return Todo.findOne({
+        where: {
+          Id: req.params.id,
+          UserId: req.user.id,
+        }
+      })
     })
-    .catch(err => {
-      return console.error(err)
-    })
+    .then((todo) => { return res.render('edit', { todo: todo.get() }) })
 })
 // update todo
 router.put('/:id', (req, res) => {
-  Todo.findOne({ _id: req.params.id, userId: req.user._id })
-    .then(todo => {
+  Todo.findOne({
+    where: {
+      Id: req.params.id,
+      UserId: req.user.id,
+    }
+  })
+    .then((todo) => {
       todo.name = req.body.name
+      todo.done = req.body.done === "on"
 
-      if (req.body.done === 'on') {
-        todo.done = true
-      } else {
-        todo.done = false
-      }
-
-      todo.save(err => {
-        if (err) {
-          return console.error(err)
-        }
-        return res.redirect(`/todos/${req.params.id}`)
-      })
+      return todo.save()
     })
-    .catch(err => {
-      return console.error(err)
-    })
+    .then((todo) => { return res.redirect(`/todos/${req.params.id}`) })
+    .catch((error) => { return res.status(422).json(error) })
 })
 // delete todo
 router.delete('/:id', (req, res) => {
-  Todo.findOne({ _id: req.params.id, userId: req.user._id })
-    .then(todo => {
-      todo.remove(err => {
-        if (err) {
-          return console.error(err)
+  User.findByPk(req.user.id)
+    .then((user) => {
+      if (!user) throw new Error("user not found")
+
+      return Todo.destroy({
+        where: {
+          UserId: req.user.id,
+          Id: req.params.id
         }
-        res.redirect('/')
       })
     })
-    .catch(err => {
-      return console.error(err)
-    })
+    .then((todo) => { return res.redirect('/') })
+    .catch((error) => { return res.status(422).json(error) })
 })
 
 module.exports = router
