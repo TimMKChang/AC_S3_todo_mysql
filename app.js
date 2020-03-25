@@ -64,6 +64,6 @@ app.use('/todos', require('./routes/todos'))
 app.use('/users', require('./routes/users'))
 app.use('/auth', require('./routes/auths'))
 
-app.listen(process.env.MONGODB_URI || port, () => {
+app.listen(process.env.PORT || port, () => {
   console.log(`App is running on localhost:${port}`)
 })
