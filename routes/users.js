@@ -89,7 +89,7 @@ router.post('/register', (req, res) => {
             newUser
               .save()
               .then(user => {
-                return res.redirect('/')
+                return res.redirect('/users/login')
               })
               .catch(err => {
                 console.log(err)
